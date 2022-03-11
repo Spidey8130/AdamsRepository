@@ -14,6 +14,9 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 // import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,6 +31,7 @@ public class Drive extends TimedRobot {
     //Initializing Right Motors
     public CANSparkMax rFMotor = new CANSparkMax(4, CANSparkMaxLowLevel.MotorType.kBrushless);
     public CANSparkMax rBMotor = new CANSparkMax(8, CANSparkMaxLowLevel.MotorType.kBrushless);
+    public TalonSRX climber = new TalonSRX(9);
     public MotorControllerGroup rMotors = new MotorControllerGroup(rFMotor, rBMotor);
     public MotorControllerGroup lMotors = new MotorControllerGroup(lFMotor, lBMotor);
 
@@ -40,8 +44,9 @@ public class Drive extends TimedRobot {
     // private Solenoid rWSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, 3);
     // private Solenoid lWSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, 4);
 
-    boolean tank;
-    boolean down;
+    boolean tank = true;
+    boolean down = false;
+    double climberM = 0.0;
     //Initializing NonMotors
     MecanumDrive mDrive = new MecanumDrive(lFMotor, lBMotor, rFMotor, rBMotor);
     DifferentialDrive tDrive = new DifferentialDrive(lMotors, rMotors);
@@ -54,6 +59,9 @@ public class Drive extends TimedRobot {
     public void DriveMain() {
         //Inverts Right Motors To Ensure They Go The Correct Way
         // rMotors.setInverted(true);
+        if (Xbox1.getYButton()) {
+            climberM = 0.3;
+        }
 
         //Tells the Robot How Much Power to Apply to the Motors Based on Controller Inputs
         if (tank && !down){ //Takes in boolean and switches solenoid output based on it. 
@@ -65,7 +73,8 @@ public class Drive extends TimedRobot {
             down = false;
         }
         if (tank) {
-            tDrive.arcadeDrive(Xbox1.getLeftY(), Xbox1.getRightX());
+            tDrive.arcadeDrive(Xbox1.getRightX(), -Xbox1.getLeftY());
+            climber.set(ControlMode.PercentOutput, climberM);
             //Puts Power of Each Motor Into Smart Dashboard
             SmartDashboard.putNumber("L Power", lMotors.get());
             SmartDashboard.putNumber("R Power", rMotors.get());
