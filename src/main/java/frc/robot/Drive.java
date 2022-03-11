@@ -45,8 +45,8 @@ public class Drive extends TimedRobot {
     // private Solenoid rWSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, 3);
     // private Solenoid lWSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, 4);
 
-    boolean tank;
-    boolean down;
+    boolean tank = false;
+    boolean down = true;
     double climberM = 0.0;
     //Initializing NonMotors
     MecanumDrive mDrive = new MecanumDrive(lFMotor, lBMotor, rFMotor, rBMotor);
@@ -55,11 +55,14 @@ public class Drive extends TimedRobot {
     XboxController Xbox1 = new XboxController(0);
     private int kJoystickChannel;
     Joystick mStick = new Joystick(kJoystickChannel);
-    // Limelight limelight = new Limelight();
+    // Limelight limelight = new Limelight();\
+    public void DriveInit() {
+        rFMotor.setInverted(true);
+        rBMotor.setInverted(true);
+    }
 
     public void DriveMain() {
         //Inverts Right Motors To Ensure They Go The Correct Way
-        // rMotors.setInverted(true);
         if (Xbox1.getYButton()) {
             climberM = 0.3;
         }
@@ -88,7 +91,8 @@ public class Drive extends TimedRobot {
             SmartDashboard.putNumber("LB Power", lBMotor.get());
             SmartDashboard.putNumber("RF Power", rFMotor.get());
             SmartDashboard.putNumber("RB Power", rBMotor.get());
-        } else if (!tank) {
+        } 
+        else if (!tank) {
             mDrive.setSafetyEnabled(true);
             while (isTeleop() && isEnabled()) {
                 if ( Xbox1.getRightBumperPressed()) {
